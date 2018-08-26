@@ -49,9 +49,13 @@ def evaluate_arima_model(X, arima_order):
     return rmse
  
 # evaluate combinations of p, d and q values for an ARIMA model
+best_p = 0
+best_d = 0
+best_q = 1
 def evaluate_models(dataset, p_values, d_values, q_values):
+
     dataset = dataset.astype('float32')
-    best_score, best_cfg = float("inf"), None
+    best_score, evaluate_models.best_cfg = float("inf"), None
     for p in p_values:
         for d in d_values:
             for q in q_values:
@@ -59,11 +63,17 @@ def evaluate_models(dataset, p_values, d_values, q_values):
                 try:
                     mse = evaluate_arima_model(dataset, order)
                     if mse < best_score:
-                        best_score, best_cfg = mse, order
+                        best_score, evaluate_models.best_cfg = mse, order
                     print('ARIMA%s RMSE=%.3f' % (order,mse))
+                    #print (type(best_cfg))
                 except:
                     continue
-    print('Best ARIMA%s RMSE=%.3f' % (best_cfg, best_score))
+    print('Best ARIMA%s RMSE=%.3f' % (evaluate_models.best_cfg, best_score))
+    evaluate_models.best_p, evaluate_models.best_d, evaluate_models.best_q = (evaluate_models.best_cfg)
+
+def getBestcfg():
+    return evaluate_models.best_cfg
+    
 
 
 def checkbias(p, d, q):
@@ -92,4 +102,9 @@ def checkbias(p, d, q):
     residuals = [test[i]-predictions[i] for i in range(len(test))]
     residuals = DataFrame(residuals)
     print(residuals.describe())
+    
+    checkbias.bias_mean = residuals.describe().loc[['mean']]
+    
+def getBias():
+    return checkbias.bias_mean
     

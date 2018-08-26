@@ -30,16 +30,20 @@ from main import variables
 
 #Data
 from Data import validate
-validate.split_datafile(variables.datafileloc, variables.datasetloc, variables.validationloc)
+#validate.split_datafile(variables.datafileloc, variables.datasetloc, variables.validationloc)
 
 #Model evaluation
 from Model import performence
 
-series = Series.from_csv(variables.datasetloc)
-p_values = range(0, 7)
-d_values = range(0, 3)
-q_values = range(0, 7)
-warnings.filterwarnings("ignore")
+#series = Series.from_csv(variables.datasetloc)
+#p_values = range(0, 7)
+##d_values = range(0, 3)
+#q_values = range(0, 7)
+
+#best_p = performence.best_p
+#best_d = performence.best_d
+#best_q = performence.best_q
+#warnings.filterwarnings("ignore")
 
 '''
  Step one: Eveluate the models, use the model with the lowest RMSE
@@ -51,8 +55,14 @@ warnings.filterwarnings("ignore")
  copy and paste the value of 'mean'
 '''
 #performence.evaluate_models(series.values, p_values, d_values, q_values)
-#performence.checkbias(0, 0, 1)
 
+
+#best_p, best_d, best_q = (performence.getBestcfg())
+#performence.checkbias(best_p, best_d, best_q)
+
+
+#print(performence.getBias())
+#best_bias = performence.getBias()
 
 '''
  Step two: Creating the ARIMA-model
@@ -65,14 +75,46 @@ warnings.filterwarnings("ignore")
 from Model import test
 from Model import arima
 #test.test_function()
-#arima.arimaModel(0,0,1,165.904727)
+#arima.arimaModel(best_p,best_d,best_q, best_bias)
 
 #Prediction
 from Model import predict
 
 #predict.predictFuture() #predicts beyond datafile without validation through training
-#predict.predictRun(0,0,1) #predicts next values of dataset with validation from datafile values
+#predict.predictRun(best_p,best_d,best_q) #predicts next values of dataset with validation from datafile values
 
+
+def newDataserRun():
+    validate.split_datafile(variables.datafileloc, variables.datasetloc, variables.validationloc)
+    
+    series = Series.from_csv(variables.datasetloc)
+    p_values = range(0, 7)
+    d_values = range(0, 3)
+    q_values = range(0, 7)
+    
+    warnings.filterwarnings("ignore")
+    
+    performence.evaluate_models(series.values, p_values, d_values, q_values)
+
+
+    best_p, best_d, best_q = (performence.getBestcfg())
+    performence.checkbias(best_p, best_d, best_q)
+    #print(performence.getBias())
+    best_bias = performence.getBias()
+    
+    arima.arimaModel(best_p,best_d,best_q, best_bias)
+    
+    predict.predictRun(best_p,best_d,best_q)
+
+
+
+    
+def loadDatasetRun():
+    validate.split_datafile(variables.datafileloc, variables.datasetloc, variables.validationloc)
+    predict.predictFuture() 
+    
+#newDataserRun()
+loadDatasetRun()
 #Analysis
 from Analysis import Summary
 from Analysis import LinePlot
